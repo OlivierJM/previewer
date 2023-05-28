@@ -64,7 +64,7 @@ const FileUploadArea = ({
         <Text align="center">
           Upload or type url to a hymnal json file to get started. The content of the json
           should be an array of objects with a title,content and number property like
-          the example shown below:
+          the example shown below or you can check examples of other files here <a href="https://github.com/TinasheMzondiwa/cis-hymnals">https://github.com/TinasheMzondiwa/cis-hymnals</a>
         </Text>
         <br />
         <ReactMarkdown>
@@ -79,14 +79,12 @@ const FileUploadArea = ({
           ]
           `
         }
-
-
         </ReactMarkdown>
 
         <br />
         <Text align="center" color="red">
           {error &&
-            `${error}, make sure the content of the file matches the above format`}
+            `${error}, make sure the file is JSON and the content of the file matches the format above`}
         </Text>
       </div>
     </Container>
