@@ -11,6 +11,7 @@ import { useMediaQuery } from '@mantine/hooks';
 import { ItemProps } from './utils';
 import HymnItem from './components/HymnItem';
 import HymnPreview from './components/HymnPreview';
+import FIleUploadArea from './components/FileUploadArea';
 
 const MarkdownList: React.FC = () => {
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
@@ -20,8 +21,8 @@ const MarkdownList: React.FC = () => {
   const isMobile = useMediaQuery('(max-width: 768px)');
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+  const handleFileUpload = (payload: File | null) => {
+    const file = payload;
     const reader = new FileReader();
 
     reader.onload = (e) => {
@@ -31,8 +32,7 @@ const MarkdownList: React.FC = () => {
         validateJson(jsonData);
         setError(null);
       } catch (error) {
-        console.error('Error parsing JSON file:', error);
-        setError('Invalid JSON file.');
+        setError(error as  string);
       }
     };
 
@@ -44,15 +44,20 @@ const MarkdownList: React.FC = () => {
   const validateJson = (jsonData: ItemProps[]) => {
     if (!Array.isArray(jsonData)) {
       throw new Error(
-        'Invalid JSON format. "items" property must be an array.'
+        'Invalid JSON format. contents of this JSON file must be an array.'
       );
     }
 
     for (const item of jsonData) {
-      if (typeof item.title !== 'string' || typeof item.content !== 'string') {
-        throw new Error(
-          'Invalid JSON format. "title" and "content" properties must be strings.'
-        );
+      if (item.title || item.content || item.number) {
+        if (
+          typeof item.title !== 'string' ||
+          typeof item.content !== 'string'
+        ) {
+          throw new Error(
+            'Invalid JSON format. "title" and "content" properties must be strings.'
+          );
+        }
       }
     }
   };
@@ -72,10 +77,14 @@ const MarkdownList: React.FC = () => {
     setIsDrawerOpen(false);
   };
 
+
+  if (error || !list) {
+    return <FIleUploadArea handleFileUpload={handleFileUpload} error={error} />;
+  }
+
   return (
     <>
-      <input type="file" accept=".json" onChange={handleFileUpload} />
-      <Container size="sm">
+      <Container size={isMobile ? "sm" : "xl"}>
         {isMobile && (
           <Button
             variant="outline"

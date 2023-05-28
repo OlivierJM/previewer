@@ -1,11 +1,7 @@
 import MarkdownList from './JsonPreviewer';
 
 function App() {
-  return (
-    <>
-      <MarkdownList />
-    </>
-  );
+  return <MarkdownList />;
 }
 
 export default App;
