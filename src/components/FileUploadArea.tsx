@@ -1,6 +1,29 @@
-import { Text, Button, Container, FileButton, Code } from '@mantine/core';
+import {
+  Text,
+  Button,
+  Container,
+  FileButton,
+  Code,
+  Input,
+  Grid,
+} from '@mantine/core';
+import { useState, ChangeEvent } from 'react';
+import { ReactMarkdown } from 'react-markdown/lib/react-markdown';
 
-const FileUploadArea = ({ handleFileUpload, error }: { handleFileUpload: (payload: File | null) => void, error: string | null }) => {
+interface Props {
+  handleFileUpload: (payload: File | null) => void;
+  error: string | null;
+  handleFetchData:(url: string) =>  void;
+  loading: boolean;
+}
+
+const FileUploadArea = ({
+  handleFileUpload,
+  error,
+  handleFetchData,
+  loading,
+}: Props) => {
+  const [url, setUrl] = useState<string>('');
   return (
     <Container size="md" style={{ height: '100vh' }}>
       <div
@@ -12,27 +35,58 @@ const FileUploadArea = ({ handleFileUpload, error }: { handleFileUpload: (payloa
           justifyContent: 'center',
         }}
       >
-
-        <FileButton  onChange={handleFileUpload} accept=".json">
+        <FileButton onChange={handleFileUpload} accept=".json">
           {(props) => <Button {...props}>Upload JSON File</Button>}
         </FileButton>
         <br />
-        <Text align="center" >
-         Upload a hymnal json file to get started.
-         The content of the json should be an array of objects with a title and content property like the following:
+        <Text align="center">OR</Text>
+        <br />
+        <Grid >
+          <Grid.Col md={11} sm={10}>
+            <Input
+              placeholder="Enter JSON URL"
+              value={url}
+              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                setUrl(event?.target.value)
+              }
+
+            />
+          </Grid.Col>
+          <Grid.Col md={1} sm={2}>
+            <Button variant="outline" onClick={() => handleFetchData(url)} loading={loading} disabled={!url}>
+              Fetch Data
+            </Button>
+          </Grid.Col>
+        </Grid>
+        <br />
+        <Code>{url}</Code>
+        <br />
+        <Text align="center">
+          Upload or type url to a hymnal json file to get started. The content of the json
+          should be an array of objects with a title,content and number property like
+          the example shown below:
         </Text>
         <br />
-        <Code>
-          {`{
-            "title": "3 Face To Face",
-            "number": 3,
-            "content": "<h1>some html here</h1>"
-          }`}
-        </Code>
+        <ReactMarkdown>
+        {
+          `
+          [
+            {
+              "title": "3 Face To Face",
+              "number": 3,
+              "content": "<h1>some html here</h1>"
+            }
+          ]
+          `
+        }
+
+
+        </ReactMarkdown>
 
         <br />
         <Text align="center" color="red">
-          {error &&`${error}, make sure the content of the file matches the above format`}
+          {error &&
+            `${error}, make sure the content of the file matches the above format`}
         </Text>
       </div>
     </Container>
@@ -40,5 +94,3 @@ const FileUploadArea = ({ handleFileUpload, error }: { handleFileUpload: (payloa
 };
 
 export default FileUploadArea;
-
-

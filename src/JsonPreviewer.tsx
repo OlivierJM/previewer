@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Grid,
   List,
@@ -6,6 +6,7 @@ import {
   Container,
   Button,
   Drawer,
+  Center,
 } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { ItemProps } from './utils';
@@ -20,6 +21,14 @@ const MarkdownList: React.FC = () => {
   const theme = useMantineTheme();
   const isMobile = useMediaQuery('(max-width: 768px)');
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+
+  useEffect(() => {
+    scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [selectedItem]);
+
 
   const handleFileUpload = (payload: File | null) => {
     const file = payload;
@@ -30,9 +39,10 @@ const MarkdownList: React.FC = () => {
         const jsonData: ItemProps[] = JSON.parse(e.target?.result as string);
         setList(jsonData);
         validateJson(jsonData);
+        setSelectedItem(jsonData[0].content);
         setError(null);
       } catch (error) {
-        setError(error as  string);
+        setError(error as string);
       }
     };
 
@@ -62,6 +72,26 @@ const MarkdownList: React.FC = () => {
     }
   };
 
+  const handleFetchData = async (url: string) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Error fetching data.');
+      }
+      const jsonData = await response.json();
+      validateJson(jsonData);
+      setList(jsonData);
+      setSelectedItem(jsonData[0].content);
+      setError(null);
+    } catch (error) {
+      console.error('Error fetching JSON data:', error);
+      setError(error as string);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleItemClick = (content: string) => {
     setSelectedItem(content);
     if (isMobile) {
@@ -77,24 +107,31 @@ const MarkdownList: React.FC = () => {
     setIsDrawerOpen(false);
   };
 
-
-  if (error || !list) {
-    return <FIleUploadArea handleFileUpload={handleFileUpload} error={error} />;
+  if (!list) {
+    return (
+      <FIleUploadArea
+        handleFileUpload={handleFileUpload}
+        error={error}
+        loading={isLoading}
+        handleFetchData={handleFetchData}
+      />
+    );
   }
 
   return (
     <>
-      <Container size={isMobile ? "sm" : "xl"}>
+      <Container size={isMobile ? 'sm' : 'xl'}>
+        <br />
         {isMobile && (
           <Button
             variant="outline"
             onClick={handleOpenDrawer}
             style={{ marginBottom: theme.spacing.sm }}
           >
-            Open Drawer
+            Show songs
           </Button>
         )}
-
+      <div ref={scrollRef} />
         {!isMobile && (
           <Grid>
             <Grid.Col span={4}>
@@ -111,6 +148,18 @@ const MarkdownList: React.FC = () => {
             </Grid.Col>
             <Grid.Col span={8}>
               <HymnPreview selectedItem={selectedItem} />
+              <Center>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setList(null)
+                    setSelectedItem(null)
+                  }}
+                  style={{ marginBottom: theme.spacing.sm, margin: 20, bottom: 0, position: 'absolute' }}
+                >
+                  Upload another file
+                </Button>
+              </Center>
             </Grid.Col>
           </Grid>
         )}
@@ -118,6 +167,18 @@ const MarkdownList: React.FC = () => {
         {isMobile && (
           <>
             <HymnPreview selectedItem={selectedItem} />
+            <Center>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setList(null)
+                    setSelectedItem(null)
+                  }}
+                  style={{ marginBottom: theme.spacing.sm, margin: 20, bottom: 0, position: 'absolute' }}
+                >
+                  Upload another file
+                </Button>
+              </Center>
             <Drawer
               opened={isDrawerOpen}
               onClose={handleCloseDrawer}
