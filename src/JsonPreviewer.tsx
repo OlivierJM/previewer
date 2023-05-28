@@ -1,27 +1,24 @@
 import React, { useState } from 'react';
-import ReactMarkdown from 'react-markdown';
 import {
   Grid,
-  TypographyStylesProvider,
   List,
-  Text,
-  Paper,
-  Center,
   useMantineTheme,
   Container,
+  Button,
+  Drawer,
 } from '@mantine/core';
-
-interface Item {
-  title: string;
-  content: string;
-  number: number;
-}
+import { useMediaQuery } from '@mantine/hooks';
+import { ItemProps } from './utils';
+import HymnItem from './components/HymnItem';
+import HymnPreview from './components/HymnPreview';
 
 const MarkdownList: React.FC = () => {
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [list, setList] = useState<Item[] | null>(null);
+  const [list, setList] = useState<ItemProps[] | null>(null);
   const theme = useMantineTheme();
+  const isMobile = useMediaQuery('(max-width: 768px)');
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -29,7 +26,7 @@ const MarkdownList: React.FC = () => {
 
     reader.onload = (e) => {
       try {
-        const jsonData: Item[] = JSON.parse(e.target?.result as string);
+        const jsonData: ItemProps[] = JSON.parse(e.target?.result as string);
         setList(jsonData);
         validateJson(jsonData);
         setError(null);
@@ -44,7 +41,7 @@ const MarkdownList: React.FC = () => {
     }
   };
 
-  const validateJson = (jsonData: Item[]) => {
+  const validateJson = (jsonData: ItemProps[]) => {
     if (!Array.isArray(jsonData)) {
       throw new Error(
         'Invalid JSON format. "items" property must be an array.'
@@ -62,58 +59,77 @@ const MarkdownList: React.FC = () => {
 
   const handleItemClick = (content: string) => {
     setSelectedItem(content);
+    if (isMobile) {
+      setIsDrawerOpen(false);
+    }
+  };
+
+  const handleOpenDrawer = () => {
+    setIsDrawerOpen(true);
+  };
+
+  const handleCloseDrawer = () => {
+    setIsDrawerOpen(false);
   };
 
   return (
     <>
       <input type="file" accept=".json" onChange={handleFileUpload} />
-      <Container size="xl">
-        <Grid>
-          <Grid.Col span={4}>
-            <ul>
+      <Container size="sm">
+        {isMobile && (
+          <Button
+            variant="outline"
+            onClick={handleOpenDrawer}
+            style={{ marginBottom: theme.spacing.sm }}
+          >
+            Open Drawer
+          </Button>
+        )}
+
+        {!isMobile && (
+          <Grid>
+            <Grid.Col span={4}>
               <List listStyleType="none" withPadding>
-                {list?.map((item, index) => (
-                  <List.Item
-                    key={index}
-                    onClick={() => handleItemClick(item.content)}
-                    style={{
-                      cursor: 'pointer',
-                      backgroundColor:
-                        selectedItem === item.content
-                          ? theme.colors.gray[0]
-                          : 'transparent',
-                      paddingLeft: theme.spacing.md,
-                      paddingRight: theme.spacing.md,
-                      paddingTop: theme.spacing.xs,
-                      paddingBottom: theme.spacing.xs,
-                      borderLeft: `3px solid ${theme.colors.blue[6]}`,
-                      borderRadius: theme.radius.sm,
-                      marginBottom: theme.spacing.xs,
-                    }}
-                  >
-                    <Text
-                      style={{
-                        fontWeight:
-                          selectedItem === item.content ? 'bold' : 'normal',
-                      }}
-                    >
-                      {item.title}
-                    </Text>
-                  </List.Item>
+                {list?.map((item) => (
+                  <HymnItem
+                    key={item.number}
+                    item={item}
+                    selectedItem={selectedItem}
+                    handleItemClick={handleItemClick}
+                  />
                 ))}
               </List>
-            </ul>
-          </Grid.Col>
-          <Grid.Col span={8}>
-            <Center>
-              {error && <p>{error}</p>}
-              <TypographyStylesProvider>
-                <div dangerouslySetInnerHTML={{ __html: selectedItem || '' }} />
-              </TypographyStylesProvider>
-              {/* {selectedItem && <ReactMarkdown>{selectedItem}</ReactMarkdown>} */}
-            </Center>
-          </Grid.Col>
-        </Grid>
+            </Grid.Col>
+            <Grid.Col span={8}>
+              <HymnPreview selectedItem={selectedItem} />
+            </Grid.Col>
+          </Grid>
+        )}
+
+        {isMobile && (
+          <>
+            <HymnPreview selectedItem={selectedItem} />
+            <Drawer
+              opened={isDrawerOpen}
+              onClose={handleCloseDrawer}
+              size="md"
+              padding="md"
+              title="List of Hymns"
+              withCloseButton={false}
+            >
+              <List listStyleType="none" withPadding>
+                {list?.map((item) => (
+                  <HymnItem
+                    key={item.number}
+                    item={item}
+                    selectedItem={selectedItem}
+                    handleItemClick={handleItemClick}
+                  />
+                ))}
+              </List>
+            </Drawer>
+          </>
+        )}
       </Container>
     </>
   );
