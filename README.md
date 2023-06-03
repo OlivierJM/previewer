@@ -8,16 +8,6 @@ This is little utility to help preview hymns in different formats, currently we 
 
 https://previewer-psi.vercel.app
 
-
-## Installation
-
-Install my-project with npm
-
-```bash
-  npm install my-project
-  cd my-project
-```
-
 ## Run Locally
 
 Clone the project
