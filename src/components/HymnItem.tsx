@@ -2,8 +2,9 @@ import { List, useMantineTheme, Text } from '@mantine/core';
 import { ItemProps } from '../utils';
 
 interface Props {
-    item: ItemProps;selectedItem: string | null;
-    handleItemClick: (content: string) => void;
+    item: ItemProps;
+    selectedItem: string | null;
+    handleItemClick: (content?: string) => void;
 }
 
 
@@ -11,7 +12,7 @@ const HymnItem = ({ item, selectedItem, handleItemClick }: Props) => {
   const theme = useMantineTheme();
   return (
     <List.Item
-      onClick={() => handleItemClick(item.content)}
+      onClick={() => handleItemClick(item.content || item.markdown)}
       style={{
         cursor: 'pointer',
         backgroundColor:

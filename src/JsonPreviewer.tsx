@@ -92,8 +92,8 @@ const MarkdownList: React.FC = () => {
     }
   };
 
-  const handleItemClick = (content: string) => {
-    setSelectedItem(content);
+  const handleItemClick = (content?: string) => {
+    setSelectedItem(content as string);
     if (isMobile) {
       setIsDrawerOpen(false);
     }

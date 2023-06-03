@@ -74,7 +74,21 @@ const FileUploadArea = ({
             {
               "title": "3 Face To Face",
               "number": 3,
-              "content": "<h1>some html here</h1>"
+              "content": "<h1>some html here, content can also in markdown</h1>"
+            }
+          ]
+          `
+        }
+        </ReactMarkdown>
+        We also support this format
+        <ReactMarkdown>
+        {
+          `
+          [
+            {
+              "title": "3 Face To Face",
+              "number": 3,
+              "markdown": "### some markdown here"
             }
           ]
           `
