@@ -24,11 +24,9 @@ const MarkdownList: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [selectedItem]);
-
 
   const handleFileUpload = (payload: File | null) => {
     const file = payload;
@@ -37,8 +35,8 @@ const MarkdownList: React.FC = () => {
     reader.onload = (e) => {
       try {
         const jsonData: ItemProps[] = JSON.parse(e.target?.result as string);
-        setList(jsonData);
         validateJson(jsonData);
+        setList(jsonData);
         setSelectedItem(jsonData[0].content);
         setError(null);
       } catch (error) {
@@ -57,15 +55,17 @@ const MarkdownList: React.FC = () => {
         'Invalid JSON format. contents of this JSON file must be an array.'
       );
     }
-
     for (const item of jsonData) {
-      if (item.title || item.content || item.number) {
-        if (
-          typeof item.title !== 'string' ||
-          typeof item.content !== 'string'
-        ) {
+      if ((item.title && item.content) || item.markdown) {
+        if (item.content && typeof item.content !== 'string') {
           throw new Error(
-            'Invalid JSON format. "title" and "content" properties must be strings.'
+            `Invalid JSON format. "content" property of item with title "${item.title}" must be a string.`
+          );
+        }
+
+        if (item.markdown && typeof item.markdown !== 'string') {
+          throw new Error(
+            `Invalid JSON format. "markdown" property of item with title "${item.title}" must be a string.`
           );
         }
       }
@@ -131,19 +131,20 @@ const MarkdownList: React.FC = () => {
             Show songs
           </Button>
         )}
-      <div ref={scrollRef} />
+        <div ref={scrollRef} />
         {!isMobile && (
           <Grid>
             <Grid.Col span={4}>
               <List listStyleType="none" withPadding>
-                {list?.map((item) => (
-                  <HymnItem
-                    key={item.number}
-                    item={item}
-                    selectedItem={selectedItem}
-                    handleItemClick={handleItemClick}
-                  />
-                ))}
+                {!error &&
+                  list?.map((item) => (
+                    <HymnItem
+                      key={item.number}
+                      item={item}
+                      selectedItem={selectedItem}
+                      handleItemClick={handleItemClick}
+                    />
+                  ))}
               </List>
             </Grid.Col>
             <Grid.Col span={8}>
@@ -152,10 +153,15 @@ const MarkdownList: React.FC = () => {
                 <Button
                   variant="outline"
                   onClick={() => {
-                    setList(null)
-                    setSelectedItem(null)
+                    setList(null);
+                    setSelectedItem(null);
                   }}
-                  style={{ marginBottom: theme.spacing.sm, margin: 20, bottom: 0, position: 'absolute' }}
+                  style={{
+                    marginBottom: theme.spacing.sm,
+                    margin: 20,
+                    bottom: 0,
+                    position: 'absolute',
+                  }}
                 >
                   Upload another file
                 </Button>
@@ -168,17 +174,22 @@ const MarkdownList: React.FC = () => {
           <>
             <HymnPreview selectedItem={selectedItem} />
             <Center>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setList(null)
-                    setSelectedItem(null)
-                  }}
-                  style={{ marginBottom: theme.spacing.sm, margin: 20, bottom: 0, position: 'absolute' }}
-                >
-                  Upload another file
-                </Button>
-              </Center>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setList(null);
+                  setSelectedItem(null);
+                }}
+                style={{
+                  marginBottom: theme.spacing.sm,
+                  margin: 20,
+                  bottom: 0,
+                  position: 'absolute',
+                }}
+              >
+                Upload another file
+              </Button>
+            </Center>
             <Drawer
               opened={isDrawerOpen}
               onClose={handleCloseDrawer}
@@ -188,14 +199,15 @@ const MarkdownList: React.FC = () => {
               withCloseButton={false}
             >
               <List listStyleType="none" withPadding>
-                {list?.map((item) => (
-                  <HymnItem
-                    key={item.number}
-                    item={item}
-                    selectedItem={selectedItem}
-                    handleItemClick={handleItemClick}
-                  />
-                ))}
+                {!error &&
+                  list?.map((item) => (
+                    <HymnItem
+                      key={item.number}
+                      item={item}
+                      selectedItem={selectedItem}
+                      handleItemClick={handleItemClick}
+                    />
+                  ))}
               </List>
             </Drawer>
           </>

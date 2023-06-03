@@ -17,6 +17,8 @@ interface Props {
   loading: boolean;
 }
 
+
+
 const FileUploadArea = ({
   handleFileUpload,
   error,
@@ -25,10 +27,10 @@ const FileUploadArea = ({
 }: Props) => {
   const [url, setUrl] = useState<string>('');
   return (
-    <Container size="md" style={{ height: '100vh' }}>
+    <Container size="md" style={{ height: '120vh' }}>
       <div
         style={{
-          height: '80%',
+          height:'100%',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -80,21 +82,11 @@ const FileUploadArea = ({
           `
         }
         </ReactMarkdown>
-        We also support this format
-        <ReactMarkdown>
-        {
-          `
-          [
-            {
-              "title": "3 Face To Face",
-              "number": 3,
-              "markdown": "### some markdown here"
-            }
-          ]
-          `
-        }
-        </ReactMarkdown>
-
+        <br />
+        <Text >
+        We also support this format markdown key, so you can have
+        <code>"markdown": "## Some markdown here" instead of content.</code>
+        </Text>
         <br />
         <Text align="center" color="red">
           {error &&
