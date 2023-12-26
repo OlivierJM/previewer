@@ -9,7 +9,7 @@ import {
 } from "@tabler/icons-react";
 
 import classes from "./FloatingButtons.module.css";
-import { useColorScheme } from "../../Context/ColorScheme";
+import { useColorMode } from "../../Context/ColorMode";
 
 export default function FloatingButtons({
     uploadAnotherFile,
@@ -18,7 +18,7 @@ export default function FloatingButtons({
     uploadAnotherFile: () => void;
     downloadJson: () => void;
 }) {
-    const { colorScheme, toggleColorScheme } = useColorScheme();
+    const { colorMode, toggleColorMode } = useColorMode();
 
     return (
         <Affix
@@ -41,7 +41,7 @@ export default function FloatingButtons({
                     <Menu.Label>Options</Menu.Label>
                     <Menu.Item
                         leftSection={
-                            colorScheme === "light" ? (
+                            colorMode === "light" ? (
                                 <IconMoon
                                     style={{ width: rem(14), height: rem(14) }}
                                 />
@@ -51,9 +51,9 @@ export default function FloatingButtons({
                                 />
                             )
                         }
-                        onClick={toggleColorScheme}
+                        onClick={toggleColorMode}
                     >
-                        {colorScheme === "light" ? "Dark mode" : "Light mode"}
+                        {colorMode === "light" ? "Dark mode" : "Light mode"}
                     </Menu.Item>
                     <Menu.Item
                         leftSection={

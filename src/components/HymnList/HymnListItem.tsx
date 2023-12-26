@@ -1,6 +1,6 @@
 import { List, Text, useMantineTheme } from "@mantine/core";
 import { Hymn } from "../../utils";
-import { useColorScheme } from "../../Context/ColorScheme";
+import { useColorMode } from "../../Context/ColorMode";
 
 export function HymnListItem({
     item,
@@ -12,7 +12,7 @@ export function HymnListItem({
     handleItemClick: (hymnNumber: number) => void;
 }) {
     const theme = useMantineTheme();
-    const { colorScheme } = useColorScheme();
+    const { colorMode } = useColorMode();
 
     return (
         <List.Item
@@ -21,10 +21,10 @@ export function HymnListItem({
             style={{
                 cursor: "pointer",
                 "--hover-color":
-                    theme.colors.gray[colorScheme === "dark" ? 9 : 0],
+                    theme.colors.gray[colorMode === "dark" ? 9 : 0],
                 backgroundColor:
                     selectedItem === item.number
-                        ? theme.colors.gray[colorScheme === "dark" ? 8 : 1]
+                        ? theme.colors.gray[colorMode === "dark" ? 8 : 1]
                         : "transparent",
                 paddingLeft: theme.spacing.md,
                 paddingTop: theme.spacing.xs,

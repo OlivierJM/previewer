@@ -3,24 +3,24 @@ import PreviewContainer from "./PreviewContainer";
 import "./App.css";
 import "@mantine/core/styles.css";
 import "@mantine/tiptap/styles.css";
-import { ColorSchemeProvider, useColorScheme } from "./Context/ColorScheme";
+import { ColorModeProvider, useColorMode } from "./Context/ColorMode";
 
-function AppWithColorSchemeProvider() {
+function AppWithColorModeProvider() {
     return (
-        <ColorSchemeProvider>
+        <ColorModeProvider>
             <App />
-        </ColorSchemeProvider>
+        </ColorModeProvider>
     );
 }
 
 function App() {
-    const { colorScheme } = useColorScheme();
+    const { colorMode } = useColorMode();
 
     return (
-        <MantineProvider forceColorScheme={colorScheme}>
+        <MantineProvider forceColorScheme={colorMode}>
             <PreviewContainer />
         </MantineProvider>
     );
 }
 
-export default AppWithColorSchemeProvider;
+export default AppWithColorModeProvider;
