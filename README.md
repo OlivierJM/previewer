@@ -1,8 +1,6 @@
-
 # Previewer
 
-This is little utility to help preview hymns in different formats, currently we support markdown and html.
-
+This is little utility to help preview hymns in different formats, currently we support markdown and html. It also allows for editing the hymns with a WYSIWYG editor.
 
 ## Demo
 
@@ -34,14 +32,13 @@ Start the dev server
   npm run dev
 ```
 
-
 ## Features
 
-- Song listing
-- Song Preview
-- HTML/Markdown
-- Upload/Url JSON preview
-
+-   Song listing
+-   Song Preview
+-   Song editing
+-   HTML/Markdown
+-   Upload/Url JSON preview
 
 ### Supported file structure
 
@@ -56,12 +53,12 @@ Currently we support JSON files that have a structure that looks like this
     }
 ]
 ```
+
 The above HTML or Markdown can be in the content property, the previewer will render whichever is provided accordingly.
 
-Another supported format is the followin
+Another supported format is the following
 
 ```json
-
 [
     {
         "title": "3 Face To Face",
@@ -70,14 +67,13 @@ Another supported format is the followin
     }
 ]
 ```
-In the above example, the property name is makrdown instead of content, this too is supported as long as the provided content is valid markdown.
+
+In the above example, the property name is markdown instead of content, this too is supported as long as the provided content is valid markdown.
 
 ## Feedback
 
 If you have any feedback, please reach out to us at manolivier93@gmail.com or create an issue.
 
-
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
-
