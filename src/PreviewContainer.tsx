@@ -15,7 +15,7 @@ export type HymnMap = Record<number, Hymn>;
 export default function PreviewContainer() {
     const [selectedItem, setSelectedItem] = useState<number>(1);
     const [error, setError] = useState<string | null>(null);
-    const [originalHymns, setOriginalHymns] = useState<Hymn[] | null>(null);
+    const [, setOriginalHymns] = useState<Hymn[] | null>(null);
     const [editedHymns, setEditedHymns] = useState<HymnMap | null>(null);
     const [editing, setEditing] = useState(false);
     const [drawerOpened, { toggle }] = useDisclosure();

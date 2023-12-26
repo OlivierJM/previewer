@@ -2,7 +2,7 @@ import { ActionIcon, Affix, Menu, rem } from "@mantine/core";
 import {
     IconAdjustmentsHorizontal,
     IconDownload,
-    IconGitCompare,
+    // IconGitCompare,
     IconMoon,
     IconSun,
     IconUpload,
