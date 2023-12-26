@@ -18,7 +18,7 @@ export default function PreviewContainer() {
     const [, setOriginalHymns] = useState<Hymn[] | null>(null);
     const [editedHymns, setEditedHymns] = useState<HymnMap | null>(null);
     const [editing, setEditing] = useState(false);
-    const [drawerOpened, { toggle }] = useDisclosure();
+    const [drawerOpened, { toggle, close }] = useDisclosure();
     const [fileName, setFileName] = useState("hymnal.json");
 
     useEffect(() => {
@@ -42,9 +42,7 @@ export default function PreviewContainer() {
     };
 
     const handleItemClick = (hymnNumber: number) => {
-        if (drawerOpened) {
-            toggle();
-        }
+        close();
         setSelectedItem(hymnNumber);
     };
 

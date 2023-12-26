@@ -7,11 +7,13 @@ import {
     Input,
     Grid,
     Space,
+    Modal,
 } from "@mantine/core";
 import { useState, ChangeEvent } from "react";
 
 import classes from "./FileUploadArea.module.css";
 import { Hymn, getFilenameFromResponse } from "../utils";
+import { useDisclosure } from "@mantine/hooks";
 
 type FileUploadAreaProps = {
     error: string | null;
@@ -26,15 +28,16 @@ const FileUploadArea = ({
 }: FileUploadAreaProps) => {
     const [url, setUrl] = useState<string>("");
     const [isLoading, setIsLoading] = useState(false);
+    const [opened, { open, close }] = useDisclosure(false);
 
     const validateJson = (jsonData: Hymn[]) => {
         if (!Array.isArray(jsonData)) {
             throw new Error(
-                "Invalid JSON format. contents of this JSON file must be an array."
+                "Invalid JSON format. Contents of this JSON file must be an array."
             );
         }
-        for (const item of jsonData) {
-            if ((item.title && item.content) || item.markdown) {
+        for (const [index, item] of jsonData.entries()) {
+            if (item.title && item.number && (item.content || item.markdown)) {
                 if (item.content && typeof item.content !== "string") {
                     throw new Error(
                         `Invalid JSON format. "content" property of item with title "${item.title}" must be a string.`
@@ -46,6 +49,12 @@ const FileUploadArea = ({
                         `Invalid JSON format. "markdown" property of item with title "${item.title}" must be a string.`
                     );
                 }
+            } else {
+                throw new Error(
+                    `Invalid JSON element at index ${index}. Every element must have valid "title" and 
+                    "number" values, as well as a "content" or "markdown" value. The invalid element is: 
+                    "${JSON.stringify(item, null, 2)}"`
+                );
             }
         }
     };
@@ -61,6 +70,7 @@ const FileUploadArea = ({
                 handleLoadedData(jsonData, file?.name || "hymnal.json");
             } catch (error) {
                 setError(error as string);
+                open();
             }
         };
 
@@ -85,6 +95,7 @@ const FileUploadArea = ({
         } catch (error) {
             console.error("Error fetching JSON data:", error);
             setError(error as string);
+            open();
         } finally {
             setIsLoading(false);
         }
@@ -133,28 +144,40 @@ const FileUploadArea = ({
                     </a>
                 </Text>
                 <Space h="md" />
-                <pre>{`
-{
+                <Code>
+                    <pre>{`{
     "title": "3 Face To Face",
     "number": 3,
-    "content": "<h1>some html here, content can also in markdown</h1>"
+    "content": "<h1>Some html here</h1>"
 }`}</pre>
+                </Code>
                 <Space h="md" />
                 <Text>
                     We also support the markdown format, so you can have:
                 </Text>
                 <Space h="md" />
-                <pre>{`
-{
+                <Code>
+                    <pre>{`{
     "title": "3 Face To Face",
     "number": 3,
     "markdown": "## Some markdown here",
 }`}</pre>
+                </Code>
                 <Space h="md" />
-                <Text color="red">
-                    {error &&
-                        `${error}, make sure the file is JSON and the content of the file matches the format above`}
-                </Text>
+                <Modal
+                    title="An error occured"
+                    opened={opened}
+                    onClose={close}
+                    centered
+                    overlayProps={{
+                        backgroundOpacity: 0.55,
+                        blur: 3,
+                    }}
+                    color="red"
+                >
+                    {error && `${error}`} Make sure the file is JSON and the
+                    content of the file matches the given format
+                </Modal>
             </div>
         </Container>
     );

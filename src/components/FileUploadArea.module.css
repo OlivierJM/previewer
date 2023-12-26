@@ -7,10 +7,13 @@
     justify-content: center;
 }
 
+.container code {
+    max-width: 100%;
+    padding: 5px 20px;
+}
+
 @media screen and (max-width: 768px) {
-    .container pre {
+    .container code {
         overflow-x: scroll;
-        max-width: 100%;
-        padding: 10px;
     }
 }
