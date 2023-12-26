@@ -1,7 +1,26 @@
-import MarkdownList from './JsonPreviewer';
+import { MantineProvider } from "@mantine/core";
+import PreviewContainer from "./JsonPreviewer";
+import "./App.css";
+import "@mantine/core/styles.css";
+import "@mantine/tiptap/styles.css";
+import { ColorSchemeProvider, useColorScheme } from "./Context/ColorScheme";
 
-function App() {
-  return <MarkdownList />;
+function AppWithColorSchemeProvider() {
+    return (
+        <ColorSchemeProvider>
+            <App />
+        </ColorSchemeProvider>
+    );
 }
 
-export default App;
+function App() {
+    const { colorScheme } = useColorScheme();
+
+    return (
+        <MantineProvider forceColorScheme={colorScheme}>
+            <PreviewContainer />
+        </MantineProvider>
+    );
+}
+
+export default AppWithColorSchemeProvider;

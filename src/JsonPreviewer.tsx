@@ -1,220 +1,128 @@
-import React, { useEffect, useRef, useState } from 'react';
-import {
-  Grid,
-  List,
-  useMantineTheme,
-  Container,
-  Button,
-  Drawer,
-  Center,
-} from '@mantine/core';
-import { useMediaQuery } from '@mantine/hooks';
-import { ItemProps } from './utils';
-import HymnItem from './components/HymnItem';
-import HymnPreview from './components/HymnPreview';
-import FIleUploadArea from './components/FileUploadArea';
+import { useEffect, useState } from "react";
+import { AppShell } from "@mantine/core";
+import { useDebounceCallback, useDisclosure } from "@mantine/hooks";
 
-const MarkdownList: React.FC = () => {
-  const [selectedItem, setSelectedItem] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [list, setList] = useState<ItemProps[] | null>(null);
-  const theme = useMantineTheme();
-  const isMobile = useMediaQuery('(max-width: 768px)');
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const scrollRef = useRef<HTMLDivElement>(null);
+import { Hymn, downloadJsonFile, useDebouncedAction } from "./utils";
+import HymnPreview from "./components/HymnPreview";
+import FileUploadArea from "./components/FileUploadArea";
+import { AppHeader } from "./components/AppHeader";
+import { HymnList } from "./components/HymnList";
+import FloatingButtons from "./components/FloatingButtons";
+import HymnEditor from "./components/HymnEditor";
 
-  useEffect(() => {
-    scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [selectedItem]);
+export type HymnMap = Record<number, Hymn>;
 
-  const handleFileUpload = (payload: File | null) => {
-    const file = payload;
-    const reader = new FileReader();
+export default function PreviewContainer() {
+    const [selectedItem, setSelectedItem] = useState<number>(1);
+    const [error, setError] = useState<string | null>(null);
+    const [originalHymns, setOriginalHymns] = useState<Hymn[] | null>(null);
+    const [editedHymns, setEditedHymns] = useState<HymnMap | null>(null);
+    const [editing, setEditing] = useState(false);
+    const [drawerOpened, { toggle }] = useDisclosure();
+    const [fileName, setFileName] = useState("hymnal.json");
 
-    reader.onload = (e) => {
-      try {
-        const jsonData: ItemProps[] = JSON.parse(e.target?.result as string);
-        validateJson(jsonData);
-        setList(jsonData);
-        setSelectedItem(jsonData[0].content);
+    useEffect(() => {
+        document.body.scrollIntoView({ behavior: "smooth" });
+    }, [selectedItem]);
+
+    const handleLoadedData = (jsonData: Hymn[], fileName: string) => {
+        setOriginalHymns(jsonData);
+        setEditedHymns(
+            jsonData.reduce(
+                (accumulator, current) => ({
+                    ...accumulator,
+                    [current.number]: current,
+                }),
+                {}
+            )
+        );
+        setSelectedItem(jsonData[0].number);
         setError(null);
-      } catch (error) {
-        setError(error as string);
-      }
+        setFileName(fileName);
     };
 
-    if (file) {
-      reader.readAsText(file);
-    }
-  };
-
-  const validateJson = (jsonData: ItemProps[]) => {
-    if (!Array.isArray(jsonData)) {
-      throw new Error(
-        'Invalid JSON format. contents of this JSON file must be an array.'
-      );
-    }
-    for (const item of jsonData) {
-      if ((item.title && item.content) || item.markdown) {
-        if (item.content && typeof item.content !== 'string') {
-          throw new Error(
-            `Invalid JSON format. "content" property of item with title "${item.title}" must be a string.`
-          );
+    const handleItemClick = (hymnNumber: number) => {
+        if (drawerOpened) {
+            toggle();
         }
+        setSelectedItem(hymnNumber);
+    };
 
-        if (item.markdown && typeof item.markdown !== 'string') {
-          throw new Error(
-            `Invalid JSON format. "markdown" property of item with title "${item.title}" must be a string.`
-          );
-        }
-      }
+    if (!editedHymns) {
+        return (
+            <FileUploadArea
+                error={error}
+                handleLoadedData={handleLoadedData}
+                setError={setError}
+            />
+        );
     }
-  };
 
-  const handleFetchData = async (url: string) => {
-    setIsLoading(true);
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error('Error fetching data.');
-      }
-      const jsonData = await response.json();
-      validateJson(jsonData);
-      setList(jsonData);
-      setSelectedItem(jsonData[0].content);
-      setError(null);
-    } catch (error) {
-      console.error('Error fetching JSON data:', error);
-      setError(error as string);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    const selectedHymn = editedHymns[selectedItem];
 
-  const handleItemClick = (content?: string) => {
-    setSelectedItem(content as string);
-    if (isMobile) {
-      setIsDrawerOpen(false);
-    }
-  };
-
-  const handleOpenDrawer = () => {
-    setIsDrawerOpen(true);
-  };
-
-  const handleCloseDrawer = () => {
-    setIsDrawerOpen(false);
-  };
-
-  if (!list) {
     return (
-      <FIleUploadArea
-        handleFileUpload={handleFileUpload}
-        error={error}
-        loading={isLoading}
-        handleFetchData={handleFetchData}
-      />
+        <AppShell
+            header={{ height: 60 }}
+            navbar={{
+                width: 300,
+                breakpoint: "sm",
+                collapsed: { mobile: !drawerOpened },
+            }}
+            padding="md"
+        >
+            <AppHeader
+                drawerOpened={drawerOpened}
+                toggle={toggle}
+                selectedHymn={selectedHymn}
+                hymns={editedHymns}
+                toggleEditing={() => setEditing((value) => !value)}
+                setSelectedItem={setSelectedItem}
+                selectedItem={selectedItem}
+            />
+            <AppShell.Navbar p="md" style={{ overflow: "scroll" }}>
+                <HymnList
+                    error={error}
+                    list={Object.values(editedHymns)}
+                    selectedItem={selectedItem}
+                    handleItemClick={handleItemClick}
+                />
+            </AppShell.Navbar>
+            <AppShell.Main>
+                {editing ? (
+                    <HymnEditor
+                        currentHymn={selectedHymn}
+                        updateHymn={(updater) =>
+                            setEditedHymns((hymn) =>
+                                hymn
+                                    ? {
+                                          ...hymn,
+                                          [selectedHymn.number]: updater(
+                                              hymn[selectedHymn.number]
+                                          ),
+                                      }
+                                    : hymn
+                            )
+                        }
+                    />
+                ) : (
+                    <HymnPreview selectedItem={selectedHymn} />
+                )}
+                <FloatingButtons
+                    uploadAnotherFile={() => {
+                        setOriginalHymns(null);
+                        setSelectedItem(1);
+                        setEditedHymns(null);
+                    }}
+                    downloadJson={() =>
+                        downloadJsonFile(
+                            Object.values(editedHymns).sort(
+                                (a, b) => a.number - b.number
+                            ),
+                            fileName
+                        )
+                    }
+                />
+            </AppShell.Main>
+        </AppShell>
     );
-  }
-
-  return (
-    <>
-      <Container size={isMobile ? 'sm' : 'xl'}>
-        <br />
-        {isMobile && (
-          <Button
-            variant="outline"
-            onClick={handleOpenDrawer}
-            style={{ marginBottom: theme.spacing.sm }}
-          >
-            Show songs
-          </Button>
-        )}
-        <div ref={scrollRef} />
-        {!isMobile && (
-          <Grid>
-            <Grid.Col span={4}>
-              <List listStyleType="none" withPadding>
-                {!error &&
-                  list?.map((item) => (
-                    <HymnItem
-                      key={item.number}
-                      item={item}
-                      selectedItem={selectedItem}
-                      handleItemClick={handleItemClick}
-                    />
-                  ))}
-              </List>
-            </Grid.Col>
-            <Grid.Col span={8}>
-              <HymnPreview selectedItem={selectedItem} />
-              <Center>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setList(null);
-                    setSelectedItem(null);
-                  }}
-                  style={{
-                    marginBottom: theme.spacing.sm,
-                    margin: 20,
-                    bottom: 0,
-                    position: 'absolute',
-                  }}
-                >
-                  Upload another file
-                </Button>
-              </Center>
-            </Grid.Col>
-          </Grid>
-        )}
-
-        {isMobile && (
-          <>
-            <HymnPreview selectedItem={selectedItem} />
-            <Center>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setList(null);
-                  setSelectedItem(null);
-                }}
-                style={{
-                  marginBottom: theme.spacing.sm,
-                  margin: 20,
-                  bottom: 0,
-                  position: 'absolute',
-                }}
-              >
-                Upload another file
-              </Button>
-            </Center>
-            <Drawer
-              opened={isDrawerOpen}
-              onClose={handleCloseDrawer}
-              size="md"
-              padding="md"
-              title="List of Hymns"
-              withCloseButton={false}
-            >
-              <List listStyleType="none" withPadding>
-                {!error &&
-                  list?.map((item) => (
-                    <HymnItem
-                      key={item.number}
-                      item={item}
-                      selectedItem={selectedItem}
-                      handleItemClick={handleItemClick}
-                    />
-                  ))}
-              </List>
-            </Drawer>
-          </>
-        )}
-      </Container>
-    </>
-  );
-};
-
-export default MarkdownList;
+}
