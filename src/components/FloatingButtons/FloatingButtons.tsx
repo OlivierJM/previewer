@@ -9,7 +9,7 @@ import {
 } from "@tabler/icons-react";
 
 import classes from "./FloatingButtons.module.css";
-import { useColorScheme } from "../Context/ColorScheme";
+import { useColorScheme } from "../../Context/ColorScheme";
 
 export default function FloatingButtons({
     uploadAnotherFile,
@@ -18,7 +18,7 @@ export default function FloatingButtons({
     uploadAnotherFile: () => void;
     downloadJson: () => void;
 }) {
-    let { colorScheme, toggleColorScheme } = useColorScheme();
+    const { colorScheme, toggleColorScheme } = useColorScheme();
 
     return (
         <Affix

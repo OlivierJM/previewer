@@ -51,11 +51,11 @@ export function getFilenameFromResponse(
  * @returns A callback which performs the required action after a delay
  */
 export function useDebouncedAction() {
-    let [lastAction, setLastAction] = useState<{
+    const [lastAction, setLastAction] = useState<{
         timeOutId: number;
     } | null>(null);
 
-    let delayAction = useCallback(
+    const delayAction = useCallback(
         (performAction: () => void, milliseconds: number) => {
             if (lastAction !== null) {
                 clearTimeout(lastAction.timeOutId);

@@ -12,7 +12,7 @@ import {
 import { useState, ChangeEvent } from "react";
 
 import classes from "./FileUploadArea.module.css";
-import { Hymn, getFilenameFromResponse } from "../utils";
+import { Hymn, getFilenameFromResponse } from "../../utils";
 import { useDisclosure } from "@mantine/hooks";
 
 type FileUploadAreaProps = {

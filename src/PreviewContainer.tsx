@@ -3,12 +3,12 @@ import { AppShell } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 
 import { Hymn, downloadJsonFile } from "./utils";
-import HymnPreview from "./components/HymnPreview";
-import FileUploadArea from "./components/FileUploadArea";
-import { AppHeader } from "./components/AppHeader";
-import { HymnList } from "./components/HymnList";
-import FloatingButtons from "./components/FloatingButtons";
-import HymnEditor from "./components/HymnEditor";
+import HymnPreview from "./components/HymnPreview/HymnPreview";
+import FileUploadArea from "./components/FileUploadArea/FileUploadArea";
+import { AppHeader } from "./components/AppHeader/AppHeader";
+import { HymnList } from "./components/HymnList/HymnList";
+import FloatingButtons from "./components/FloatingButtons/FloatingButtons";
+import HymnEditor from "./components/HymnEditor/HymnEditor";
 
 export type HymnMap = Record<number, Hymn>;
 

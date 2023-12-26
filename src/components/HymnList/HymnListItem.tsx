@@ -1,43 +1,8 @@
 import { List, Text, useMantineTheme } from "@mantine/core";
-import { Hymn } from "../utils";
-import { useEffect } from "react";
+import { Hymn } from "../../utils";
+import { useColorScheme } from "../../Context/ColorScheme";
 
-import { useColorScheme } from "../Context/ColorScheme";
-
-export function HymnList({
-    error,
-    list,
-    selectedItem,
-    handleItemClick,
-}: {
-    error: string | null;
-    list: Hymn[];
-    selectedItem: number | null;
-    handleItemClick: (hymnNumber: number) => void;
-}) {
-    useEffect(() => {
-        let listItem = document.getElementById("hymn-" + selectedItem);
-        if (listItem) {
-            listItem.scrollIntoView({ behavior: "smooth", block: "center" });
-        }
-    }, [selectedItem]);
-
-    return (
-        <List listStyleType="none" withPadding>
-            {!error &&
-                list?.map((item) => (
-                    <HymnItem
-                        key={item.number}
-                        item={item}
-                        selectedItem={selectedItem}
-                        handleItemClick={handleItemClick}
-                    />
-                ))}
-        </List>
-    );
-}
-
-function HymnItem({
+export function HymnListItem({
     item,
     selectedItem,
     handleItemClick,
@@ -47,7 +12,7 @@ function HymnItem({
     handleItemClick: (hymnNumber: number) => void;
 }) {
     const theme = useMantineTheme();
-    let { colorScheme } = useColorScheme();
+    const { colorScheme } = useColorScheme();
 
     return (
         <List.Item
