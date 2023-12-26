@@ -15,7 +15,7 @@ import {
 } from "@tabler/icons-react";
 
 import classes from "./AppHeader.module.css";
-import { HymnMap } from "../JsonPreviewer";
+import { HymnMap } from "../PreviewContainer";
 
 export function AppHeader({
     drawerOpened,

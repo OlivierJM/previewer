@@ -1,12 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-    Box,
-    Center,
-    Container,
-    Space,
-    TextInput,
-    Textarea,
-} from "@mantine/core";
+import { Center, Container, Space, TextInput, Textarea } from "@mantine/core";
 import { RichTextEditor } from "@mantine/tiptap";
 import { useEditor, Editor as ReactEditor } from "@tiptap/react";
 import { Editor } from "@tiptap/core";
